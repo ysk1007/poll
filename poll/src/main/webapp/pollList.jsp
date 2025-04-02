@@ -3,6 +3,9 @@
 <%@ page import="java.util.*" %>
 <%@ page import="dto.*" %>
 <%@ page import="model.*" %>
+<%@ page import="java.text.*" %>
+<%@ page import="java.util.Date" %>
+
 <%
 	// question 테이블 리스트 -> 페이징 -> title링크(startdate <= 오늘날짜 <= enddate) -> 투표프로그램
 	// QuestionDao.selectQuestionList()
@@ -11,7 +14,7 @@
 		currentPage = Integer.parseInt(request.getParameter("currentPage"));
 	}
 	
-	int rowPerPage = 10;
+	int rowPerPage = 5;
 	int lastPage = 0;
 	
 	String jsp = "/poll/pollList.jsp";
@@ -26,7 +29,14 @@
 	
 	lastPage = paging.getLastPage(questionDao.getTotalDataCount());
 	
-	Calendar c = Calendar.getInstance();
+	// 오늘 날짜 가져오기
+    Calendar today = Calendar.getInstance();
+    today.set(Calendar.HOUR_OF_DAY, 0);
+    today.set(Calendar.MINUTE, 0);
+    today.set(Calendar.SECOND, 0);
+    today.set(Calendar.MILLISECOND, 0);
+    
+    Date todayDate = today.getTime();
 %>
 <!DOCTYPE html>
 <html>
@@ -46,6 +56,7 @@
 			<th>시작일</th>
 			<th>종료일</th>
 			<th>타입</th>
+			<th>투표하기</th>
 		</tr>
 	<%
 		for(Question q : list){
@@ -56,6 +67,22 @@
 				<td><%=q.getStartdate()%></td>
 				<td><%=q.getEnddate()%></td>
 				<td><%=q.getType()%></td>
+				<td>
+					<%
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+					    Date startDate = sdf.parse(q.getStartdate());
+					    Date endDate = sdf.parse(q.getEnddate());
+	
+				        // 날짜 비교
+				        if (todayDate.before(startDate)) {
+				        	%>투표시작전<%
+				        } else if (todayDate.after(endDate)) {
+				        	%>투표종료<%
+				        } else {
+				        	%><a href="">[투표하기]</a><%
+				        }
+					%>
+				</td>
 			</tr>
 			<%
 		}
