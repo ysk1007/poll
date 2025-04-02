@@ -2,12 +2,11 @@ package dto;
 
 public class Question {
 	private int num;
-	private String content;
+	private String title;
 	private String startdate;
 	private String enddate;
 	private String createdate;
 	private int type;
-	private int active;
 	
 	public int getNum() {
 		return num;
@@ -15,11 +14,11 @@ public class Question {
 	public void setNum(int num) {
 		this.num = num;
 	}
-	public String getContent() {
-		return content;
+	public String getTitle() {
+		return title;
 	}
-	public void setContent(String content) {
-		this.content = content;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 	public String getStartdate() {
 		return startdate;
@@ -44,11 +43,5 @@ public class Question {
 	}
 	public void setType(int type) {
 		this.type = type;
-	}
-	public int getActive() {
-		return active;
-	}
-	public void setActive(int active) {
-		this.active = active;
 	}
 }
