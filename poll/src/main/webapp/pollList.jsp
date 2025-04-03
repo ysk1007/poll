@@ -36,7 +36,9 @@
     today.set(Calendar.SECOND, 0);
     today.set(Calendar.MILLISECOND, 0);
     
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     Date todayDate = today.getTime();
+    
 %>
 <!DOCTYPE html>
 <html>
@@ -53,10 +55,13 @@
 		<tr>
 			<th>투표 번호</th>
 			<th>주제</th>
-			<th>시작일</th>
-			<th>종료일</th>
-			<th>타입</th>
+			<th>기간</th>
+			<th>복수투표</th>
 			<th>투표하기</th>
+			<th>삭제</th>
+			<th>수정</th>
+			<th>종료일자수정</th>
+			<th>결과</th>
 		</tr>
 	<%
 		for(Question q : list){
@@ -64,12 +69,10 @@
 			<tr>
 				<td><%=q.getNum()%></td>
 				<td><%=q.getTitle()%></td>
-				<td><%=q.getStartdate()%></td>
-				<td><%=q.getEnddate()%></td>
-				<td><%=q.getType()%></td>
+				<td><%=q.getStartdate()%> ~ <%=q.getEnddate()%></td>
+				<td><%=q.getType() == 1 ? "가능" : "불가능"%></td>
 				<td>
 					<%
-						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 					    Date startDate = sdf.parse(q.getStartdate());
 					    Date endDate = sdf.parse(q.getEnddate());
 	
@@ -80,6 +83,30 @@
 				        	%>투표종료<%
 				        } else {
 				        	%><a href="">[투표하기]</a><%
+				        }
+					%>
+				</td>
+				<td>
+					<a href="/poll/deletePollAction.jsp?qnum=<%=q.getNum()%>">[삭제]</a>
+				</td>
+				<td>
+					<%
+				        // 날짜 비교
+				        if (todayDate.after(endDate)) { // 투표가 종료되면 수정이 불가능 함
+				        	%>종료됨<%
+				        }else {
+				        	%><a href="/poll/updatePollForm.jsp?qnum=<%=q.getNum()%>">[수정]</a><%
+				        }
+					%>
+				</td>
+				<td><a href="/poll/updateQuestionEnddateForm.jsp?qnum=<%=q.getNum()%>">[종료일자수정]</a></td>
+				<td>
+					<%
+				        // 날짜 비교
+				        if (todayDate.after(endDate)) { // 투표가 종료되면 수정이 불가능 함
+				        	%><a href="/poll/updatePollForm.jsp?qnum=<%=q.getNum()%>">[결과]</a><%
+				        }else {
+				        	%>집계중<%
 				        }
 					%>
 				</td>

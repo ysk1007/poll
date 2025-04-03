@@ -4,10 +4,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>투표 페이지</title>
+<title>설문 작성</title>
 </head>
 <body>
-	<h1>투표 페이지</h1>
+	<h1>설문 작성</h1>
 	<hr>
 	<h2>설문작성</h2>
 	<form method="post" action="/poll/insertPollAction.jsp">
