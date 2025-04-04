@@ -34,6 +34,34 @@ public class ItemDao {
 		
 		conn.close();
 	}
+
+	
+	//---------- UPDATE ----------//
+	
+	public void updateItemCount(int qnum, int inum) throws ClassNotFoundException, SQLException{
+		PreparedStatement stmt;
+		Connection conn;
+		
+		Class.forName("com.mysql.cj.jdbc.Driver");
+		
+		String sql = "UPDATE item SET count = count + 1 WHERE qnum=? AND inum = ?";
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/poll","root","java1234");
+		stmt = conn.prepareStatement(sql);
+		stmt.setInt(1, qnum);
+		stmt.setInt(2, inum);
+		
+		int row = stmt.executeUpdate();
+		
+		if(row == 1) {
+			System.out.println("ItemDao.updateItemCount - 카운트 증가 성공");
+		}
+		else {
+			System.out.println("ItemDao.updateItemCount - 카운트 증가 실패");
+		}
+		
+		conn.close();
+	}
+	
 	
 	//---------- SELECT ----------//
 	
@@ -52,7 +80,8 @@ public class ItemDao {
 						+ " content,"
 						+ " count"
 					+ " FROM item"
-					+ " WHERE qnum = ?";
+					+ " WHERE qnum = ?"
+					+ " ORDER BY inum ASC";
 		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/poll","root","java1234");
 		
 		stmt = conn.prepareStatement(sql);
@@ -79,6 +108,41 @@ public class ItemDao {
 		return list;
 	}
 
+	
+	// qnum 받아서 아이템 리스트 반환
+	public int selectItemCount(int qnum) throws ClassNotFoundException, SQLException{
+		int count = 0;
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+
+		Class.forName("com.mysql.cj.jdbc.Driver");
+		
+		String sql = "SELECT "
+				+ " qnum, "
+				+ " SUM(count) AS count "
+				+ " FROM item "
+				+ " GROUP BY qnum "
+				+ " HAVING qnum = ?";
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/poll","root","java1234");
+		
+		stmt = conn.prepareStatement(sql);
+		stmt.setInt(1, qnum);
+		
+		// 디버깅
+		//System.out.println(stmt);
+		
+		rs = stmt.executeQuery();
+		
+		if(rs.next()) {
+			count = rs.getInt("count");
+		}
+		
+		conn.close();
+		
+		return count;
+	}
+	
 	//---------- DELETE ----------//
 	
 	// qnum 받아서 투표에 있는 항목들 전부 제거

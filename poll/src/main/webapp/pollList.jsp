@@ -7,16 +7,13 @@
 <%@ page import="java.util.Date" %>
 
 <%
-	// question 테이블 리스트 -> 페이징 -> title링크(startdate <= 오늘날짜 <= enddate) -> 투표프로그램
-	// QuestionDao.selectQuestionList()
 	int currentPage = 1;
 	if(request.getParameter("currentPage") != null){
 		currentPage = Integer.parseInt(request.getParameter("currentPage"));
 	}
 	
-	int rowPerPage = 5;
+	int rowPerPage = 8;
 	int lastPage = 0;
-	
 	String jsp = "/poll/pollList.jsp";
 	
 	Paging paging = new Paging();
@@ -24,116 +21,154 @@
 	paging.setRowPerPage(rowPerPage);
 	
 	QuestionDao questionDao = new QuestionDao();
-	
 	ArrayList<Question> list = questionDao.selectQuestionList(paging);
-	
 	lastPage = paging.getLastPage(questionDao.getTotalDataCount());
 	
-	// 오늘 날짜 가져오기
-    Calendar today = Calendar.getInstance();
-    today.set(Calendar.HOUR_OF_DAY, 0);
-    today.set(Calendar.MINUTE, 0);
-    today.set(Calendar.SECOND, 0);
-    today.set(Calendar.MILLISECOND, 0);
-    
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    Date todayDate = today.getTime();
-    
+	Calendar today = Calendar.getInstance();
+	today.set(Calendar.HOUR_OF_DAY, 0);
+	today.set(Calendar.MINUTE, 0);
+	today.set(Calendar.SECOND, 0);
+	today.set(Calendar.MILLISECOND, 0);
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	Date todayDate = today.getTime();
 %>
+
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>투표 리스트</title>
+    <meta charset="UTF-8">
+    <title>투표 리스트</title>
+
+    <!-- SB Admin 2 CSS -->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+	<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+	<link href="css/sb-admin-2.min.css" rel="stylesheet">
 </head>
-<body>
-	<h1>투표리스트</h1>
-	<a href="/poll/insertPollForm.jsp">[생성]</a>
-	<!-- paging 출력 
-	링크(startdate <= 오늘날짜 <= enddate) 투표시작전, 투표종료, 투표하기-->
-	<table border="1">
-		<tr>
-			<th>투표 번호</th>
-			<th>주제</th>
-			<th>기간</th>
-			<th>복수투표</th>
-			<th>투표하기</th>
-			<th>삭제</th>
-			<th>수정</th>
-			<th>종료일자수정</th>
-			<th>결과</th>
-		</tr>
-	<%
-		for(Question q : list){
-			%>
-			<tr>
-				<td><%=q.getNum()%></td>
-				<td><%=q.getTitle()%></td>
-				<td><%=q.getStartdate()%> ~ <%=q.getEnddate()%></td>
-				<td><%=q.getType() == 1 ? "가능" : "불가능"%></td>
-				<td>
-					<%
-					    Date startDate = sdf.parse(q.getStartdate());
-					    Date endDate = sdf.parse(q.getEnddate());
+<body id="page-top">
+
+<div id="wrapper">
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+		<!-- Topbar -->
+     	<jsp:include page="/inc/nav.jsp"></jsp:include>
 	
-				        // 날짜 비교
-				        if (todayDate.before(startDate)) {
-				        	%>투표시작전<%
-				        } else if (todayDate.after(endDate)) {
-				        	%>투표종료<%
-				        } else {
-				        	%><a href="">[투표하기]</a><%
-				        }
-					%>
-				</td>
-				<td>
-					<a href="/poll/deletePollAction.jsp?qnum=<%=q.getNum()%>">[삭제]</a>
-				</td>
-				<td>
-					<%
-				        // 날짜 비교
-				        if (todayDate.after(endDate)) { // 투표가 종료되면 수정이 불가능 함
-				        	%>종료됨<%
-				        }else {
-				        	%><a href="/poll/updatePollForm.jsp?qnum=<%=q.getNum()%>">[수정]</a><%
-				        }
-					%>
-				</td>
-				<td><a href="/poll/updateQuestionEnddateForm.jsp?qnum=<%=q.getNum()%>">[종료일자수정]</a></td>
-				<td>
-					<%
-				        // 날짜 비교
-				        if (todayDate.after(endDate)) { // 투표가 종료되면 수정이 불가능 함
-				        	%><a href="/poll/updatePollForm.jsp?qnum=<%=q.getNum()%>">[결과]</a><%
-				        }else {
-				        	%>집계중<%
-				        }
-					%>
-				</td>
-			</tr>
-			<%
-		}
-	%>
-	</table>
-	
-	<%=currentPage%> / <%=lastPage%>
-	
-	<br>
-	
-	<!-- 네비게이션 -->
-	<a href="<%=jsp%>?currentPage=1">[처음]</a>
-	<%
-		if(currentPage > 1){
-			%><a href="<%=jsp%>?currentPage=<%=currentPage - 1%>">[이전]</a><%
-		}
-	%>
-	
-	<%
-		if(currentPage < lastPage){
-			%><a href="<%=jsp%>?currentPage=<%=currentPage + 1%>">[다음]</a><%
-		}
-	%>
-	
-	<a href="<%=jsp%>?currentPage=<%=lastPage%>">[마지막]</a>
+        <div id="container-fluid" class="container-fluid mt-4">
+
+            <!-- Page Heading -->
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 text-gray-800">투표 리스트</h1>
+                <a href="/poll/insertPollForm.jsp" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                    <i class="fas fa-plus fa-sm text-white-50"></i> 생성
+                </a>
+            </div>
+
+            <!-- Data Table -->
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>번호</th>
+                                    <th>주제</th>
+                                    <th>기간</th>
+                                    <th>투표수</th>
+                                    <th>복수투표</th>
+                                    <th>투표하기</th>
+                                    <th>삭제</th>
+                                    <th>수정</th>
+                                    <th>종료일 수정</th>
+                                    <th>결과</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <%
+                                    for (Question q : list) {
+                                        Date startDate = sdf.parse(q.getStartdate());
+                                        Date endDate = sdf.parse(q.getEnddate());
+                                %>
+                                <tr>
+                                    <td><%= q.getNum() %></td>
+                                    <td><%= q.getTitle() %></td>
+                                    <td><%= q.getStartdate() %> ~ <%= q.getEnddate() %></td>
+                                    <td><%= q.getCount() %></td>
+                                    <td><%= q.getType() == 1 ? "가능" : "불가능" %></td>
+                                    <td>
+                                        <%
+                                            if (todayDate.before(startDate)) {
+                                                out.print("투표시작전");
+                                            } else if (todayDate.after(endDate)) {
+                                                out.print("투표종료");
+                                            } else {
+                                        %>
+                                        <a href="/poll/updateItemForm.jsp?qnum=<%=q.getNum()%>" class="btn btn-sm btn-primary">투표하기</a>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <%
+                                            if (q.getCount() > 0) {
+                                                out.print("삭제 불가");
+                                            } else {
+                                        %>
+                                        <a href="/poll/deletePollAction.jsp?qnum=<%=q.getNum()%>" class="btn btn-sm btn-danger">삭제</a>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <%
+                                            if (todayDate.after(endDate)) {
+                                                out.print("종료됨");
+                                            } else if (q.getCount() > 0) {
+                                                out.print("수정 불가");
+                                            } else {
+                                        %>
+                                        <a href="/poll/updatePollForm.jsp?qnum=<%=q.getNum()%>" class="btn btn-sm btn-warning">수정</a>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <a href="/poll/updateQuestionEnddateForm.jsp?qnum=<%=q.getNum()%>" class="btn btn-sm btn-info">종료일 수정</a>
+                                    </td>
+                                    <td>
+                                        <%
+                                            if (todayDate.after(endDate)) {
+                                        %>
+                                        <a href="/poll/questionOneResult.jsp?qnum=<%=q.getNum()%>" class="btn btn-sm btn-success">결과</a>
+                                        <% } else { out.print("집계중"); } %>
+                                    </td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paging -->
+                    <div class="mt-3">
+                        <span><%=currentPage%> / <%=lastPage%></span><br>
+
+                        <a class="btn btn-outline-primary btn-sm" href="<%=jsp%>?currentPage=1">처음</a>
+                        <% if(currentPage > 1){ %>
+                            <a class="btn btn-outline-primary btn-sm" href="<%=jsp%>?currentPage=<%=currentPage - 1%>">이전</a>
+                        <% } %>
+                        <% if(currentPage < lastPage){ %>
+                            <a class="btn btn-outline-primary btn-sm" href="<%=jsp%>?currentPage=<%=currentPage + 1%>">다음</a>
+                        <% } %>
+                        <a class="btn btn-outline-primary btn-sm" href="<%=jsp%>?currentPage=<%=lastPage%>">마지막</a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div> <!-- End Content -->
+
+    </div> <!-- End Content Wrapper -->
+
+</div> <!-- End Page Wrapper -->
+
+<!-- SB Admin 2 JS -->
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="/js/sb-admin-2.min.js"></script>
+
 </body>
 </html>

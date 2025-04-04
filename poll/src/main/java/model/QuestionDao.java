@@ -18,18 +18,20 @@ public class QuestionDao {
 		ResultSet rs = null;
 
 		Class.forName("com.mysql.cj.jdbc.Driver");
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/poll","root","java1234");
 		
 		String sql = "SELECT"
-						+ " num,"
-						+ " title,"
-						+ " startdate AS startDate,"
-						+ " enddate AS endDate,"
-						+ " createdate AS createDate,"
-						+ " type"
-					+ " FROM question"
+						+ " q.num AS num,"
+						+ " q.title AS title,"
+						+ " q.startdate AS startDate,"
+						+ " q.enddate AS endDate,"
+						+ " q.createdate AS createDate,"
+						+ " q.type AS type,"
+						+ " t.count AS count"
+					+ " FROM question q"
+					+ " INNER JOIN (SELECT qnum, SUM(COUNT) AS count FROM item GROUP BY qnum) t ON q.num = t.qnum"
 					+ " ORDER BY num DESC"
 					+ " LIMIT ?,?";
-		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/poll","root","java1234");
 		
 		stmt = conn.prepareStatement(sql);
 		stmt.setInt(1, p.getBeginRow());
@@ -49,6 +51,7 @@ public class QuestionDao {
 			q.setEnddate(rs.getString("endDate"));
 			q.setCreatedate(rs.getString("createDate"));
 			q.setType(rs.getInt("type"));
+			q.setCount(rs.getInt("count"));
 			
 			list.add(q);
 		}
@@ -66,6 +69,7 @@ public class QuestionDao {
 		ResultSet rs = null;
 
 		Class.forName("com.mysql.cj.jdbc.Driver");
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/poll","root","java1234");
 		
 		String sql = "SELECT"
 						+ " num,"
@@ -76,7 +80,6 @@ public class QuestionDao {
 						+ " type"
 					+ " FROM question"
 					+ " WHERE num = ?";
-		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/poll","root","java1234");
 		
 		stmt = conn.prepareStatement(sql);
 		stmt.setInt(1, qnum);
@@ -108,11 +111,12 @@ public class QuestionDao {
 		ResultSet rs = null;
 
 		Class.forName("com.mysql.cj.jdbc.Driver");
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/poll","root","java1234");
 		
 		String sql = "SELECT "
 						+ " COUNT(*) AS count"
 					+ " FROM question";
-		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/poll","root","java1234");
+		
 		stmt = conn.prepareStatement(sql);
 		
 		// 디버깅
@@ -175,12 +179,12 @@ public class QuestionDao {
 		PreparedStatement stmt = null;
 
 		Class.forName("com.mysql.cj.jdbc.Driver");
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/poll","root","java1234");
 		
 		String sql = "UPDATE question SET"
 						+ " title = ?,"
 						+ " type = ?"
 					+ " WHERE num = ?";
-		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/poll","root","java1234");
 		
 		stmt = conn.prepareStatement(sql);
 		stmt.setString(1, title);
@@ -247,30 +251,12 @@ public class QuestionDao {
 		Class.forName("com.mysql.cj.jdbc.Driver");
 		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/poll","root","java1234");
 		
-		// 투표자가 한명도 없는지 우선 확인
-		String sql = "SELECT"
-						+ " qnum,"
-						+ " SUM(COUNT) AS count"
-					+ " FROM item"
-					+ " GROUP BY qnum HAVING qnum = ?";
-		
-		stmt = conn.prepareStatement(sql);
-		stmt.setInt(1, qnum);
-		
-		System.out.println(stmt);
-		
-		rs = stmt.executeQuery();
-		
-		if(rs.next() && rs.getInt("count") > 0) { // 아이템이 있고, 	만약 투표자가 하나라도 있으면
-			return isDelete;			// return false
-		}
-		
 		// ITEM DELETE
 		ItemDao itemDao = new ItemDao();
 		itemDao.deleteAllItem(qnum);
 		
 		// DELETE
-		sql = "DELETE FROM question WHERE num = ?";
+		String sql = "DELETE FROM question WHERE num = ?";
 		
 		stmt = conn.prepareStatement(sql);
 		stmt.setInt(1, qnum);

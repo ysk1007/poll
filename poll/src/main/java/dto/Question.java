@@ -7,7 +7,14 @@ public class Question {
 	private String enddate;
 	private String createdate;
 	private int type;
+	private int count = 0;
 	
+	public int getCount() {
+		return count;
+	}
+	public void setCount(int count) {
+		this.count = count;
+	}
 	public int getNum() {
 		return num;
 	}
