@@ -27,13 +27,10 @@
             <!-- Begin Page Content -->
             <div class="container-fluid mt-4">
 
-                <!-- Page Heading -->
-                <h1 class="h3 mb-4 text-gray-800">설문 작성</h1>
-
                 <!-- 설문 작성 폼 -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">설문 항목 입력</h6>
+                        <h5 class="m-0 font-weight-bold text-primary">설문 항목 입력</h5>
                     </div>
                     <div class="card-body">
                         <form method="post" action="/poll/insertPollAction.jsp">

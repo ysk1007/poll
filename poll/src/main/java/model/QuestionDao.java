@@ -238,6 +238,8 @@ public class QuestionDao {
 		conn.close();
 	}
 
+	
+	
 	//---------- DELETE ----------//
 	
 	// Qnum 받아서 삭제하기 투표자 확인(SELECT) -> 삭제(DELETE)
