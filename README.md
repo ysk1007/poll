@@ -98,4 +98,4 @@ CREATE TABLE board (
 
 ## 👨‍💻 개발자
 **윤성권 (Yun Sungkwon)**  
-📫 [GitHub](https://github.com/ysk1007) | 💬 JSP 기반 개발자
+📫 [GitHub](https://github.com/ysk1007)
